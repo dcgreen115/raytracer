@@ -10,14 +10,14 @@ namespace util {
     }
 
     double randomDouble() {
-        static std::uniform_real_distribution<double> distribution(0.0, 1.0);
-        static std::mt19937 generator(time(nullptr));
+        static std::default_random_engine generator{std::random_device{}()};
+        std::uniform_real_distribution<double> distribution(0.0, 1.0);
         return distribution(generator);
     }
 
     double randomDouble(double min, double max) {
-        static std::uniform_real_distribution<double> distribution(min, max);
-        static std::mt19937 generator(time(nullptr));
+        static std::default_random_engine generator{std::random_device{}()};
+        std::uniform_real_distribution<double> distribution(min, max);
         return distribution(generator);
     }
 }

@@ -140,3 +140,18 @@ bool Vec3::nearZero() const {
 Vec3 Vec3::reflect(const Vec3 &v, const Vec3 &n) {
     return v - 2*dot(v, n)*n;
 }
+
+Vec3 Vec3::refract(const Vec3 &uv, const Vec3 &n, double etaiOverEtat) {
+    auto cosTheta = fmin(dot(-uv, n), 1);
+    Vec3 rOutPerp = etaiOverEtat * (uv + cosTheta*n);
+    Vec3 rOutParallel = -sqrt(fabs(1.0 - pow(rOutPerp.magnitude(), 2))) * n;
+    return rOutPerp + rOutParallel;
+}
+
+Vec3 Vec3::randomInUnitDisk() {
+    while (true) {
+        auto p = Vec3(util::randomDouble(-1, 1), util::randomDouble(-1, 1), 0);
+        if (p.magnitude() >= 1) continue;
+        return p;
+    }
+}

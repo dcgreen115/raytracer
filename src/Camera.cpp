@@ -4,19 +4,29 @@
 
 #include "Camera.hpp"
 #include "Ray.hpp"
+#include "util.hpp"
 
-Camera::Camera() {
-    auto aspectRatio = 16.0 / 9.0;
-    auto viewportHeight = 2.0;
+Camera::Camera(Point3 lookFrom, Point3 lookAt, Vec3 vUp, double vfov, double aspectRatio, double aperture, double focusDist) {
+    auto theta = util::degreesToRadians(vfov);
+    auto h = tan(theta/2);
+    auto viewportHeight = 2.0*h;
     auto viewportWidth = aspectRatio * viewportHeight;
-    auto focalLength = 1.0;
 
-    origin = Point3(0, 0, 0);
-    horizontalVector = Vec3(viewportWidth, 0, 0);
-    verticalVector = Vec3(0, viewportHeight, 0);
-    lowerLeftCorner = origin - horizontalVector/2 - verticalVector/2 - Vec3(0, 0, focalLength);
+    w = Vec3::unitVector(lookFrom - lookAt);
+    u = Vec3::unitVector(Vec3::cross(vUp, w));
+    v = Vec3::cross(w, u);
+
+    origin = lookFrom;
+    horizontalVector = focusDist * viewportWidth * u;
+    verticalVector = focusDist * viewportHeight * v;
+    lowerLeftCorner = origin - horizontalVector/2 - verticalVector/2 - focusDist * w;
+
+    lensRadius = aperture / 2;
 }
 
-Ray Camera::getRay(double u, double v) const {
-    return {origin, lowerLeftCorner + u*horizontalVector + v*verticalVector - origin};
+Ray Camera::getRay(double s, double t) const {
+    Vec3 rd = lensRadius * Vec3::randomInUnitDisk();
+    Vec3 offset = u * rd.x() + v * rd.y();
+
+    return {origin + offset,lowerLeftCorner + s*horizontalVector + t*verticalVector - origin - offset};
 }

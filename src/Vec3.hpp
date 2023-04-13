@@ -38,6 +38,7 @@ public:
     static double dot(const Vec3& v1, const Vec3& v2);
     static Vec3 cross(const Vec3& v1, const Vec3& v2);
     static Vec3 reflect(const Vec3& v, const Vec3& n);
+    static Vec3 refract(const Vec3& uv, const Vec3& n, double etaiOverEtat);
     static Vec3 unitVector(const Vec3& v);
 
     static Vec3 random();
@@ -47,6 +48,7 @@ public:
     static Vec3 randomInUnitSphere();
     static Vec3 randomUnitVector();
     static Vec3 randomInHemisphere(const Vec3& normal);
+    static Vec3 randomInUnitDisk();
 
     [[nodiscard]] bool nearZero() const;
 

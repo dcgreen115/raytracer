@@ -10,15 +10,17 @@
 
 class Camera {
 public:
-    Camera();
+    Camera(Point3 lookFrom, Point3 lookAt, Vec3 vUp, double vfov, double aspectRatio, double aperture, double focusDist);
 
-    [[nodiscard]] Ray getRay(double u, double v) const;
+    [[nodiscard]] Ray getRay(double s, double t) const;
 
 private:
     Point3 origin;
     Point3 lowerLeftCorner;
     Vec3 horizontalVector;
     Vec3 verticalVector;
+    Vec3 w, u, v;
+    double lensRadius = 1.0;
 };
 
 #endif //RAYTRACER_CAMERA_HPP
