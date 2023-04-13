@@ -10,6 +10,7 @@
 
 class Color: public Vec3 {
 public:
+    Color() = default;
     Color(double x, double y, double z);
 
     static void writeColor(std::ostream& out, Color pixelColor, int samplesPerPixel);

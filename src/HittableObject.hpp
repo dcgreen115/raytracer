@@ -5,11 +5,15 @@
 #ifndef RAYTRACER_HITTABLEOBJECT_HPP
 #define RAYTRACER_HITTABLEOBJECT_HPP
 
+#include <memory>
 #include "Ray.hpp"
+
+class Material;
 
 struct HitRecord {
     Point3 p;
     Vec3 normal;
+    std::shared_ptr<Material> materialPtr;
     double t = 0;
     bool isFrontFace = false;
 

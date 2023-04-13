@@ -2,6 +2,7 @@
 // Created by dylangreen on 4/11/23.
 //
 
+#include <cmath>
 #include "Color.hpp"
 
 Color::Color(double x, double y, double z) : Vec3(x, y, z) {}
@@ -11,11 +12,11 @@ void Color::writeColor(std::ostream &out, Color pixelColor, int samplesPerPixel)
     auto g = pixelColor.y();
     auto b = pixelColor.z();
 
-    // Divide the color by the number of samples
+    // Divide the color by the number of samples and gamma-correct for gamma = 2.0
     auto scale = 1.0 / samplesPerPixel;
-    r *= scale;
-    g *= scale;
-    b *= scale;
+    r = sqrt(scale * r);
+    g = sqrt(scale * g);
+    b = sqrt(scale * b);
 
     // Write the translated [0, 255] value of each color component
     out << static_cast<uint32_t>(256 * clamp(r, 0, 0.999)) << ' '

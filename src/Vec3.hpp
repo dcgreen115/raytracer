@@ -37,7 +37,18 @@ public:
 
     static double dot(const Vec3& v1, const Vec3& v2);
     static Vec3 cross(const Vec3& v1, const Vec3& v2);
+    static Vec3 reflect(const Vec3& v, const Vec3& n);
     static Vec3 unitVector(const Vec3& v);
+
+    static Vec3 random();
+    static Vec3 random(double min, double max);
+
+    // Used for diffuse scattering
+    static Vec3 randomInUnitSphere();
+    static Vec3 randomUnitVector();
+    static Vec3 randomInHemisphere(const Vec3& normal);
+
+    [[nodiscard]] bool nearZero() const;
 
 private:
     std::array<double, 3> data = {0, 0, 0};

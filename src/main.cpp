@@ -1,19 +1,45 @@
 #include <iostream>
-#include <cmath>
 #include "Vec3.hpp"
 #include "Color.hpp"
 #include "Ray.hpp"
 #include "HittableObject.hpp"
-#include "MainConstants.hpp"
 #include "HittableList.hpp"
 #include "Sphere.hpp"
 #include "Camera.hpp"
+#include "Material.hpp"
+#include "util.hpp"
 
-Color rayColor(const Ray& ray, const HittableObject& world) {
+Color rayColor(const Ray& ray, const HittableObject& world, int depth) {
     HitRecord record;
-    if (world.hit(ray, 0, infinity, record)) {
-        auto tempColor =  0.5 * (record.normal + Color(1, 1, 1));
-        return *((Color*) &tempColor);
+
+    // If we've exceeded the ray bounce limit, no more light is gathered
+    if (depth <= 0) {
+        return {0, 0, 0};
+    }
+
+    if (world.hit(ray, 0.001, util::infinity, record)) {
+        //auto tempColor =  0.5 * (record.normal + Color(1, 1, 1));
+        //return *((Color*) &tempColor);
+
+        // Diffuse scattering
+        // Random vector in unit sphere
+        // Point3 target = record.p + record.normal + Vec3::randomInUnitSphere();
+
+        // Random unit length vector
+        // Point3 target = record.p + record.normal + Vec3::randomUnitVector();
+
+        // Random vector in the same hemisphere as the normal
+        //Point3 target = record.p + Vec3::randomInHemisphere(record.normal);
+
+        // Using different materials
+        Ray scattered;
+        Color attenuation;
+        if (record.materialPtr->scatter(ray, record, attenuation, scattered)) {
+            auto tempColor = attenuation * rayColor(scattered, world, depth - 1);
+            return *((Color*) &tempColor);
+        } else {
+            return {0, 0, 0};
+        }
     }
 
     Vec3 unitDirection = Vec3::unitVector(ray.direction());
@@ -29,11 +55,19 @@ int main() {
     const int image_width = 400;
     const int image_height = static_cast<int>(image_width / aspectRatio);
     const int samplesPerPixel = 100;
+    const int maxDepth = 50;
 
     // World setup
     HittableList world;
-    world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5));
-    world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100));
+    auto material_ground = std::make_shared<Lambertian>(Color(0.8, 0.8, 0.0));
+    auto material_center = std::make_shared<Lambertian>(Color(0.7, 0.3, 0.3));
+    auto material_left   = std::make_shared<Metal>(Color(0.8, 0.8, 0.8));
+    auto material_right  = std::make_shared<Metal>(Color(0.8, 0.6, 0.2));
+
+    world.add(std::make_shared<Sphere>(Point3( 0.0, -100.5, -1.0), 100.0, material_ground));
+    world.add(std::make_shared<Sphere>(Point3( 0.0,    0.0, -1.0),   0.5, material_center));
+    world.add(std::make_shared<Sphere>(Point3(-1.0,    0.0, -1.0),   0.5, material_left));
+    world.add(std::make_shared<Sphere>(Point3( 1.0,    0.0, -1.0),   0.5, material_right));
 
     // Camera
     Camera cam;
@@ -47,10 +81,10 @@ int main() {
         for (int i = 0; i < image_width; ++i) {
             Color pixelColor(0, 0, 0);
             for (int s = 0; s < samplesPerPixel; s++) {
-                auto u = (i + randomDouble()) / (image_width - 1);
-                auto v = (j + randomDouble()) / (image_height - 1);
+                auto u = (i + util::randomDouble()) / (image_width - 1);
+                auto v = (j + util::randomDouble()) / (image_height - 1);
                 Ray r = cam.getRay(u, v);
-                pixelColor += rayColor(r, world);
+                pixelColor += rayColor(r, world, maxDepth);
             }
             Color::writeColor(std::cout, pixelColor, samplesPerPixel);
         }

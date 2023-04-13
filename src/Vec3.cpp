@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include "Vec3.hpp"
+#include "util.hpp"
 
 Vec3::Vec3(double x, double y, double z) {
     data[0] = x;
@@ -99,4 +100,43 @@ Vec3 Vec3::cross(const Vec3 &v1, const Vec3 &v2) {
 
 Vec3 Vec3::unitVector(const Vec3 &v) {
     return v / v.magnitude();
+}
+
+Vec3 Vec3::random() {
+    return {util::randomDouble(), util::randomDouble(), util::randomDouble()};
+}
+
+Vec3 Vec3::random(double min, double max) {
+    return {util::randomDouble(min, max), util::randomDouble(min, max), util::randomDouble(min, max)};
+}
+
+Vec3 Vec3::randomInUnitSphere() {
+    while (true) {
+        auto p = random(-1, 1);
+        if (p.magnitude() >= 1) continue;
+        return p;
+    }
+}
+
+Vec3 Vec3::randomUnitVector() {
+    return unitVector(randomInUnitSphere());
+}
+
+Vec3 Vec3::randomInHemisphere(const Vec3 &normal) {
+    Vec3 inUnitSphere = randomInUnitSphere();
+    if (dot(inUnitSphere, normal) > 0) {
+        return inUnitSphere;
+    } else {
+        return -inUnitSphere;
+    }
+}
+
+bool Vec3::nearZero() const {
+    // Return true if the vector is close to zero in all dimensions
+    const auto s = 1e-8;
+    return fabs(x()) < s &&  fabs(y()) < s && fabs(z()) < s;
+}
+
+Vec3 Vec3::reflect(const Vec3 &v, const Vec3 &n) {
+    return v - 2*dot(v, n)*n;
 }
