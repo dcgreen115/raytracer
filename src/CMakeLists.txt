@@ -7,4 +7,4 @@ add_executable(raytracer main.cpp
         Vec3.cpp Vec3.hpp
         Color.cpp Color.hpp
         Ray.cpp Ray.hpp
-        HittableObject.cpp HittableObject.hpp)
+        HittableObject.hpp Sphere.cpp Sphere.hpp HittableList.cpp HittableList.hpp MainConstants.hpp Camera.cpp Camera.hpp)

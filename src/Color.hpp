@@ -12,7 +12,10 @@ class Color: public Vec3 {
 public:
     Color(double x, double y, double z);
 
-    void writeColor(std::ostream& out);
+    static void writeColor(std::ostream& out, Color pixelColor, int samplesPerPixel);
+
+private:
+    static double clamp(double x, double min, double max);
 };
 
 #endif //RAYTRACER_COLOR_HPP
